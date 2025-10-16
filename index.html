@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomada Inteligente X - Controle sua Casa de Onde Estiver</title>
+    
+    <style>
+        /* RESET BÁSICO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+
+        /* UTILIDADES */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* ESTILO DO CABEÇALHO/HERO */
+        .hero {
+            /* MUDANÇA AQUI: Gradiente de Indigo/Roxo para Azul Escuro (Efeito Tech) */
+            background: linear-gradient(135deg, #1c2a59 0%, #3e50b4 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 0;
+            /* Efeito sutil de 'noise' ou brilho para dar textura e profundidade */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Adicionando um pseudo-elemento para um efeito de brilho/atração */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            /* Gradiente radial sutil para dar um efeito de luz vinda de trás */
+            background: radial-gradient(circle at center, rgba(131, 143, 230, 0.2) 0%, rgba(38, 50, 56, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .hero > .container {
+            position: relative; /* Garante que o conteúdo fique acima do efeito ::before */
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            /* Efeito de brilho no texto para destacar */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.4); 
+        }
+
+        .hero h2 {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        /* --- SLIDER CSS --- */
+        .slider-container {
+            position: relative;
+            max-width: 500px; /* Largura máxima do slider */
+            margin: 0 auto 40px auto; /* Centraliza o slider e adiciona margem inferior */
+            overflow: hidden; /* Esconde as imagens que não estão visíveis */
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Sombra mais escura para contraste */
+        }
+
+        .slider-wrapper {
+            display: flex; /* Coloca as imagens em linha */
+            transition: transform 0.5s ease-in-out; /* Suaviza a transição das imagens */
+        }
+
+        .slider-wrapper img {
+            width: 100%; /* Cada imagem ocupa 100% da largura do contêiner do slider */
+            height: auto;
+            display: block; /* Remove espaços extras abaixo da imagem */
+            flex-shrink: 0; /* Impede que as imagens encolham */
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: white;
+        }
+        /* --- FIM SLIDER CSS --- */
+
+        /* BOTÃO CTA (CHAMADA PARA AÇÃO) */
+        .cta-button {
+            display: inline-block;
+            background-color: #ffc107; /* Amarelo chamativo para CTA */
+            color: #333;
+            text-decoration: none;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            background-color: #ff9800;
+            transform: translateY(-2px);
+        }
+        
+        /* Efeito de clique simples para o JS */
+        .cta-button.clicked {
+            background-color: #28a745; /* Verde de sucesso */
+            transform: scale(0.98);
+        }
+
+        .cta-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* ANIMAÇÃO DE PULSO PARA O CTA (Credibilidade/Urgência) */
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 193, 7, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+            }
+        }
+
+        /* SEÇÃO DE RECURSOS */
+        .features {
+            padding: 50px 0;
+            text-align: center;
+            background-color: white;
+        }
+
+        .features h3 {
+            font-size: 2em;
+            margin-bottom: 40px;
+            color: #007bff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f0faff;
+            transition: transform 0.3s ease;
+            border: 1px solid #e0f0ff;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-item .icon {
+            font-size: 2.5em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .feature-item h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        /* SEÇÃO DE PROVA SOCIAL */
+        .social-proof {
+            padding: 50px 0;
+            text-align: center;
+            background-color: #e9ecef;
+        }
+
+        .social-proof h3 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+
+        .testimonial-card {
+            background-color: white;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .testimonial-card span {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .trust-bar {
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .trust-logos img {
+            height: 40px; /* Ajuste o tamanho dos logos de credibilidade */
+            margin: 0 15px;
+            opacity: 0.7;
+        }
+
+        /* SEÇÃO FINAL CTA */
+        .final-cta {
+            background-color: #343a40; /* Fundo escuro para destaque */
+            color: white;
+            text-align: center;
+            padding: 50px 0;
+        }
+
+        .final-cta h2 {
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .final-cta p {
+            margin-bottom: 25px;
+        }
+
+        /* RODAPÉ */
+        footer {
+            background-color: #212529;
+            color: #bbb;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+    </head>
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Controle Total. Simplicidade Máxima.</h1>
+            <h2>A Tomada Inteligente Ekaza é a sua porta de entrada para uma casa verdadeiramente conectada.</h2>
+    
+            <div class="slider-container">
+                <div class="slider-wrapper" id="imageSlider">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_979454-MLA94379645013_102025-F.webp" alt="Tomada Inteligente Ekaza - Vista Frontal">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_890277-MLA93953322590_102025-F.webp" alt="Tomada Inteligente Ekaza - Vista Lateral">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_979454-MLA94379645013_102025-F.webp" alt="Tomada Inteligente Ekaza - Na Tomada">
+                </div>
+                <div class="slider-dots" id="sliderDots">
+                    
+</div>
+            </div>
+
+            <a id="cta-button" href="https://mercadolivre.com/sec/2Sx8fsk" class="cta-button pulse">
+                Quero a minha agora!
+            </a>
+            <p class="cta-info">Entrega rápida e garantia de 1 ano. Estoque limitado.</p>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h3>Por Que Escolher a Tomada Inteligente Ekaza?</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <span class="icon">✅</span>
+                    <h4>Instalação em 30 Segundos</h4>
+                    <p>Basta plugar e conectar ao Wi-Fi. Sem complicação, sem ferramentas.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">📱</span>
+                    <h4>Controle por Voz e App</h4>
+                    <p>Compatível com Alexa, Google Assistant e nosso App intuitivo.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">💡</span>
+                    <h4>Economia de Energia</h4>
+                    <p>Monitore o consumo em tempo real e crie rotinas para evitar desperdício.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon"></span>
+                    <h4>Segurança e Paz de Espírito</h4>
+                    <p>Ligue e desligue aparelhos remotamente. Nunca mais se preocupe se esqueceu algo ligado.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="social-proof">
+        <div class="container">
+            <h3>Veja o Que Nossos Clientes Dizem</h3>
+            <div class="testimonial-card">
+                <p>"Fácil de configurar e o aplicativo é super prático! Programo o ventilador para ligar 10 minutos antes de eu chegar em casa. Recomendo!"</p>
+                <span>— Jéssica C., Várzea da Palma/MG</span>
+            </div>
+
+            <div class="trust-bar">
+                <p><strong>Mais de 10.000 lares conectados.</strong></p>
+                <div class="trust-logos">
+                    <img src="caminho/para/selo-seguranca.png" alt="Selo SSL Seguro">
+                    <img src="caminho/para/icone-pix.png" alt="Aceitamos PIX">
+                    <img src="caminho/para/icone-garantia.png" alt="Garantia Incondicional">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="container">
+            <h2>Não Deixe para Depois. Sua Casa Inteligente Começa Agora.</h2>
+            <p>Clique abaixo e transforme qualquer eletrodoméstico em um aparelho conectado.</p>
+            <a href="https://mercadolivre.com/sec/2Sx8fsk" class="cta-button">
+                Quero Minha Tomada Inteligente
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Devarejo. Todos os direitos reservados. | <a href="#">Política de Privacidade</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // JS para o botão CTA
+            const ctaButton = document.getElementById('cta-button');
+            ctaButton.addEventListener('click', function(event) {
+                ctaButton.classList.add('clicked');
+                setTimeout(() => {
+                    ctaButton.classList.remove('clicked');
+                }, 500);
+                console.log('Botão de Compra Clicado!');
+            });
+
+            // JS para o Slider de Imagens
+            const slider = document.getElementById('imageSlider');
+            const dotsContainer = document.getElementById('sliderDots');
+            const images = slider.querySelectorAll('img');
+            const totalImages = images.length;
+            let currentIndex = 0;
+            const slideIntervalTime = 3000; // 3 segundos
+            let slideInterval;
+
+            // Gera os indicadores (dots)
+            for (let i = 0; i < totalImages; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                dot.setAttribute('data-index', i);
+                dotsContainer.appendChild(dot);
+            }
+            const dots = dotsContainer.querySelectorAll('.dot');
+
+            function updateSlider() {
+                slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                dots.forEach((dot, index) => {
+                    if (index === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalImages;
+                updateSlider();
+            }
+
+            function startSlider() {
+                slideInterval = setInterval(nextSlide, slideIntervalTime);
+            }
+
+            function stopSlider() {
+                clearInterval(slideInterval);
+            }
+
+            // Adiciona funcionalidade aos dots
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    stopSlider(); // Para o slider automático ao clicar num dot
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateSlider();
+                    startSlider(); // Reinicia o slider automático
+                });
+            });
+
+            // Inicia o slider e atualiza a primeira imagem/dot
+            updateSlider();
+            startSlider();
+        });
+    </script>
+</body>
+</html>
